@@ -204,6 +204,25 @@ contract multiSigWallet {
         emit RevokeConfirmation(msg.sender, _txIndex);
         
     }
+
+    // function get transaction
+    // @param   index ID for the transaction from the array
+    function getTransaction(uint _txIndex)
+    public 
+    view
+    returns (address to, uint value, bytes memory data, bool executed, uint numConfirmations ) {
+
+      // we need to get the transaction from the array and assign it 
+      Transaction storage transaction = transactions[_txIndex];
+
+      return (
+        transaction.to,
+        transaction.value,
+        transaction.data,
+        transaction.executed,
+        transaction.numConfirmations
+      );
+    }
     
 }
     

@@ -17,10 +17,41 @@ contract("MultiSigWallet", accounts => {
   // execute transaction should fail if already executed
   it("should execute", async () => {
     // need to create a transaction and confirm it by at least two owners
+    // @params  to, value, and data required for function submitTransaction
     const to = owners[0];
     const value = 0;
     const data = "0x0";
+    //here we call the function with the required params
     await wallet.submitTransaction(to, value, data);
+    // we then call confirmTransaction to make sure that two owners out of three confirm the transaction 
+    // @params  transaction index, confirm its from owner of wallet (1 and 2) 
+    await wallet.confirmTransaction(0, {
+      from: owners[0]
+    });
+    await wallet.confirmTransaction(0, {
+      from: owners[1]
+    });
+
+    // store the result of the above transaction.executed = 0
+    const res = await wallet.executeTransaction(0, {
+      from: owners[0]
+    });
+    const {
+      logs
+    } = res;
+
+    // aasert first event that was fired was equal to execute transaction event emitted
+    // we confirm owner 0 is the one who made the call for execute transaction
+    // we make sure that the execute transaction was 0 
+    assert.equal(logs[0].event, "ExecuteTransaction");
+    assert.equal(logs[0].args.owner, owners[0]);
+    assert.equal(logs[0].args.txIndex, 0);
+
+    // here we are checking that transaction.executed is set to true
+    // first we get the transaction
+    // then we check if its true
+    const tx = await wallet.getTransaction(0);
+    assert.equal(tx.executed, true);
   });
 
 });
